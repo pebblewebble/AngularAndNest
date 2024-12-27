@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 export interface Tasks {
   id: number;
@@ -12,6 +13,7 @@ export class AppService {
     this.tasks = JSON.parse(fs.readFileSync('tasks.json', 'utf8'));
   }
   getTasks(): Tasks[] {
+    this.tasks = JSON.parse(fs.readFileSync('tasks.json', 'utf8'));
     return this.tasks;
   }
   createTask(name: string): Tasks[] {
@@ -21,8 +23,18 @@ export class AppService {
     return this.tasks;
   }
   deleteTask(id: number): Tasks[] {
-    const index = this.tasks.findIndex((task) => task.id === id);
-    this.tasks.splice(index, 1);
+    Logger.log(id)
+    let index = -1;
+    for (let i = 0; i < this.tasks.length; i++) {
+      Logger.log(this.tasks[i].id,id)
+      if (this.tasks[i].id == id) {
+        index = i;
+        break; 
+      }
+    }
+    Logger.log(index)
+    this.tasks.splice(index,1);
+    fs.writeFileSync('tasks.json', JSON.stringify(this.tasks));
     return this.tasks;
   }
 }
